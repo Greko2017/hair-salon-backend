@@ -103,6 +103,12 @@ DATABASES = {
         'PORT':  "5432", #[Port from heroku postgres]
     }
 }
+import sys
+if 'test' in sys.argv:
+    DATABASES['default'] = {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': 'mydatabase'
+    }
 # Password validation
 # https://docs.djangoproject.com/en/2.2/ref/settings/#auth-password-validators
 
@@ -180,4 +186,5 @@ SIMPLE_JWT = {
 # For development:
 CORS_ORIGIN_WHITELIST = [
     'http://localhost:3000',
+    'https://hair-salon-frontend.netlify.app',
 ]
