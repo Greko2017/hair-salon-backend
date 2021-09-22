@@ -4,4 +4,5 @@ db.sqlite3
 */migrations
 **/migrations/
 */migrations/
-migrations
+migrations/
+__pycache__/

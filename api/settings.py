@@ -89,6 +89,10 @@ WSGI_APPLICATION = 'api.wsgi.application'
 #     }
 # }
 
+## to delete migration files
+# find . -path "*/migrations/[0-9][0-9][0-9][0-9]_*.py" -delete
+# find . -path "*/migrations/*.pyc"  -delete
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
