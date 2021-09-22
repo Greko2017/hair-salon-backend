@@ -26,7 +26,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = 'o6kpq=13%)kb%t#8-8s7fvy6+u*_4y$(1v*_qm2^p=s97^26x_'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = ['hairsalon-app.herokuapp.com']
 
