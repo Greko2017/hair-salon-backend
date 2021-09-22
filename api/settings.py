@@ -82,14 +82,23 @@ WSGI_APPLICATION = 'api.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/2.2/ref/settings/#databases
 
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+#     }
+# }
+
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': "df84csjh89qeid", #[database from heroku postgres]
+        'USER': "cwlusudixruydz", #[user from heroku postgres]
+        'PASSWORD': "6c1605d9f3ef18642344391aad337b7c2df6a5c53c6696f15ce23b0d20479ed1", #[password from heroku postgres]
+        'HOST': "ec2-18-209-143-227.compute-1.amazonaws.com", #[host from heroku postgres]
+        'PORT':  "5432", #[Port from heroku postgres]
     }
 }
-
-
 # Password validation
 # https://docs.djangoproject.com/en/2.2/ref/settings/#auth-password-validators
 
