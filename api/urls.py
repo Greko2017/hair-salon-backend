@@ -28,7 +28,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include('backend.urls')),
 
-    url(r'^media/(?P<path>.*)$', serve,{'media':       settings.MEDIA_ROOT}), 
+    url(r'^media/(?P<path>.*)$', serve,{'media': settings.MEDIA_ROOT}), 
     url(r'^static/(?P<path>.*)$', serve,{'static': settings.STATIC_ROOT}), 
 
     path(r'api/v1/api-token-auth/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
