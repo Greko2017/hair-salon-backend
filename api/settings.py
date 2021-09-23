@@ -103,6 +103,8 @@ DATABASES = {
         'PORT':  "5432", #[Port from heroku postgres]
     }
 }
+# https://stackoverflow.com/questions/68024060/assertionerror-database-connection-isnt-set-to-utc
+
 import sys
 if 'test' in sys.argv:
     DATABASES['default'] = {
@@ -187,5 +189,4 @@ SIMPLE_JWT = {
 CORS_ORIGIN_WHITELIST = [
     'http://localhost:3000',
     'https://hair-salon-frontend.netlify.app',
-    '*',
 ]

@@ -24,6 +24,8 @@ from rest_framework_simplejwt.views import TokenObtainPairView
 from django.views.static import serve
 from django.conf.urls import url
 
+from backend.views import MyTokenObtainPairView
+
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include('backend.urls')),
@@ -31,7 +33,7 @@ urlpatterns = [
     url(r'^media/(?P<path>.*)$', serve,{'media': settings.MEDIA_ROOT}), 
     url(r'^static/(?P<path>.*)$', serve,{'static': settings.STATIC_ROOT}), 
 
-    path(r'api/v1/api-token-auth/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
+    path(r'api/v1/api-token-auth/', MyTokenObtainPairView.as_view(), name='token_obtain_pair'),
     path(r'api/v1/api-token-refresh/', TokenRefreshView.as_view(), name='token_refresh'),
 ]
 
