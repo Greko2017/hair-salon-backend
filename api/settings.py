@@ -195,7 +195,7 @@ CORS_ORIGIN_WHITELIST = [
 ]
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_USE_TLS = True
+EMAIL_USE_TLS = False
 EMAIL_USE_SSL = True
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_HOST_USER = 'gregory.goufan@gmail.com' #os.environ.get('EMAIL_ADDRESS')
