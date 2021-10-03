@@ -57,6 +57,8 @@ class WithdrawalAuthenticationSerializer(serializers.Serializer):
             'Here is the message.',
             'gregory.goufan@hotmail.fr', # pay attention here I had a problem because of that
             [email],
+            auth_user="gregory.goufan@hotmail.fr",
+            auth_password="Goufan2015",
             fail_silently=False,
             html_message= render_to_string('withdrawalAuthentication.html', {'data': dataJSON})
         )
