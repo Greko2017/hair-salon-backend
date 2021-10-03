@@ -200,4 +200,4 @@ EMAIL_USE_SSL = True
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_HOST_USER = 'gregory.goufan@gmail.com' #os.environ.get('EMAIL_ADDRESS')
 EMAIL_HOST_PASSWORD = 'Goufan2016' #os.environ.get('EMAIL_PASSWORD')
-EMAIL_PORT = 587
+EMAIL_PORT = 465
