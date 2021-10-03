@@ -50,7 +50,7 @@
       padding: 2rem 5rem;
       border-radius: .25rem;
       font-size: 1.5rem;
-      color: white;
+      color: white !important;
       font-weight: bold;
       text-decoration: none;
       margin: 0 4.5rem;
@@ -73,8 +73,7 @@ background-color: rgb(107, 10, 10);
     <title>Email Html</title>
 </head>
 <body>
-    <div class="container"  
-    id="template_data" data-customer={{data.customer}}  data-withdrawal_amount={{data.withdrawal_amount}} data-account_details={{data.account_details}}>
+    <div class="container">
         <div class="intro-content">
             <div class="container-item">
                 <h1>Test  App</h1>
@@ -84,60 +83,11 @@ background-color: rgb(107, 10, 10);
     </div>
     <div class="body-container">
         <div class="body-content">
-            <a href="https://hair-salon-frontend.netlify.app/test_app_result/{{data.customer.id}}__{{data.withdrawal_amount}}" class="body-item-no">No</a>
-            <a href="#" class="body-item-yes">Yes</a>
+            <a target="_blank" href={{no_link}} class="body-item-no">No</a>
+            <a target="_blank"  href={{yes_link}} class="body-item-yes">Yes</a>
         </div>
-        {{data}}
+        <!-- {{data}} -->
     </div>
 </body>
-<script>
-    document.querySelector('.body-item-yes').onclick = () => {
-
-        // Initialize new request
-        const request = new XMLHttpRequest();
-        //var template_data = document.getElementById('template_data');
-        let template_data = JSON.parse("{{data}}");
-        console.log('template_data :>> ', "{{data}}", template_data);
-        let customer = template_data.customer // "3"
-        let withdrawal_amount = template_data.withdrawal_amount // "12314"
-        let account_details = template_data.account_details // "voitures"
-
-        request.open('POST', `/https://hairsalon-app.herokuapp.com/test_api/account_details/${account_details.id}/`);
-
-        // Callback function for when request completes
-        request.onload = () => {
-
-            // Extract JSON data from request
-            const data = JSON.parse(request.responseText);
-            
-            // Update the result div
-            if (data.success) {
-                localStorage.setItem('username',data.username);
-
-                window.location.assign("/home");
-                
-            }
-            else {
-                document.querySelector('#result').innerHTML = 'There was an error.';
-            }
-        }
-
-        // Add data to send with request
-        const data = new FormData();
-        data.append('id', account_details.id);
-        data.append('amount', parseInt(account_details.amount) - parseInt(withdrawal_amount));
-        data.append('status', 'approved');
-        data.append('account_number', account_details.account_number);
-
-        console.log('Before request date send :>> ', {customer});
-        // Send request
-        request.send(data);
-
-        // Clear input field and disable button again
-        //document.querySelector('#inputUserName').value = '';
-        //document.querySelector('#submit').disabled = true;
-        return false;
-    };
-</script>
 </html>
 <!-- https://developer.mozilla.org/fr/docs/Learn/HTML/Howto/Use_data_attributes -->

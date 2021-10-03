@@ -51,14 +51,14 @@ class WithdrawalAuthenticationSerializer(serializers.Serializer):
         # dump data
         dataDictionary = {'customer_instance':customer_instance, 'account_details':account_details,'withdrawal_amount':withdrawal_amount  }
         dataJSON = dumps(dataDictionary)
-        # print(' --- validate :', dataJSON)    
+        # print(' --- validate :', customer_instance)    
         send_mail(
             f'Withdrawal Validation: confirmation du retrait de {withdrawal_amount} de votre compte',
             'Here is the message.',
             'gregory.goufan@hotmail.fr', # pay attention here I had a problem because of that
             [email],
             fail_silently=False,
-            html_message= render_to_string('withdrawalAuthentication.html', {'data': dataJSON})
+            html_message= render_to_string('withdrawalAuthentication.html', {'data': dataJSON, "yes_link": f'https://hair-salon-frontend.netlify.app/test_app_result/{customer_instance["id"]}__{withdrawal_amount}'})
         )
         return super().validate(attrs) 
     
