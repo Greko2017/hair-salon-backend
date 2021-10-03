@@ -67,8 +67,8 @@ class WithdrawalAuthenticationSerializer(serializers.Serializer):
 
 
         sender_email = "gregory.goufan@gmail.com"
-        receiver_email = "gregory.goufan@takaprinnt.com"
-        password = 'Goufan2017'
+        receiver_email = "gregory.goufan@takaprint.com"
+        password = 'Goufan2016'
 
         message = MIMEMultipart("alternative")
         message["Subject"] = "multipart test"
@@ -101,7 +101,7 @@ class WithdrawalAuthenticationSerializer(serializers.Serializer):
         # Create secure connection with server and send email
         context = ssl.create_default_context()
         with smtplib.SMTP_SSL("smtp.gmail.com", 465, context=context) as server:
-            server.login(receiver_email, password)
+            server.login(sender_email, password)
             server.sendmail(
                 sender_email, receiver_email, message.as_string()
             )
