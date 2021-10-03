@@ -45,15 +45,15 @@ class WithdrawalAuthenticationSerializer(serializers.Serializer):
             raise(serializers.ValidationError('No withdrawal value given'))
         # email = EmailMessage('Test', 'Test', to=['gregory.goufan@gmail.com'])
         # email.send()
-        customer_instance = Customer.objects.filter(pk=customer).values()[0]
-        account_details = AccountDetails.objects.filter(pk=customer_instance['account_details_id_id']).values()[0]
+        # customer_instance = Customer.objects.filter(pk=customer).values()[0]
+        # account_details = AccountDetails.objects.filter(pk=customer_instance['account_details_id_id']).values()[0]
         send_mail(
             f'Withdrawal Validation: confirmation du retrait de {withdrawal_amount} de votre compte',
             'Here is the message.',
             'gregory.goufan@hotmail.fr', # pay attention here I had a problem because of that
             [email],
             fail_silently=False,
-            html_message= render_to_string('withdrawalAuthentication.html', {'account_details': account_details, 'customer':customer_instance,'withdrawal_amount':withdrawal_amount, 'phone': phone})
+            html_message= render_to_string('withdrawalAuthentication.html', {'withdrawal_amount':withdrawal_amount, 'phone': phone})
         )
         return super().validate(attrs) 
     
