@@ -73,11 +73,8 @@ background-color: rgb(107, 10, 10);
     <title>Email Html</title>
 </head>
 <body>
-    <div class="container" 
-    id="template_data"
-    data-customer={{customer}}
-    data-withdrawal_amount={{withdrawal_amount}}
-    data-account_details="account_details">
+    <div class="container"  
+    id="template_data" data-customer={{data.customer}}  data-withdrawal_amount={{data.withdrawal_amount}} data-account_details={{data.account_details}}>
         <div class="intro-content">
             <div class="container-item">
                 <h1>Test  App</h1>
@@ -90,6 +87,7 @@ background-color: rgb(107, 10, 10);
             <a href="#" class="body-item-no">No</a>
             <a href="#" class="body-item-yes">Yes</a>
         </div>
+        {{data}}
     </div>
 </body>
 <script>
@@ -97,11 +95,12 @@ background-color: rgb(107, 10, 10);
 
         // Initialize new request
         const request = new XMLHttpRequest();
-        var template_data = document.getElementById('template_data');
-
-        let customer = template_data.dataset.customer // "3"
-        let withdrawal_amount = template_data.dataset.withdrawal_amount // "12314"
-        let account_details = template_data.dataset.account_details // "voitures"
+        //var template_data = document.getElementById('template_data');
+        let template_data = JSON.parse("{{data}}");
+        console.log('template_data :>> ', "{{data}}", template_data);
+        let customer = template_data.customer // "3"
+        let withdrawal_amount = template_data.withdrawal_amount // "12314"
+        let account_details = template_data.account_details // "voitures"
 
         request.open('POST', `/https://hairsalon-app.herokuapp.com/test_api/account_details/${account_details.id}/`);
 
@@ -130,13 +129,13 @@ background-color: rgb(107, 10, 10);
         data.append('status', 'approved');
         data.append('account_number', account_details.account_number);
 
+        console.log('Before request date send :>> ', {customer});
         // Send request
         request.send(data);
 
         // Clear input field and disable button again
         //document.querySelector('#inputUserName').value = '';
         //document.querySelector('#submit').disabled = true;
-
         return false;
     };
 </script>
