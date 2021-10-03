@@ -73,7 +73,11 @@ background-color: rgb(107, 10, 10);
     <title>Email Html</title>
 </head>
 <body>
-    <div class="container">
+    <div class="container" 
+    id="template_data"
+    data-customer={{customer}}
+    data-withdrawal_amount={{withdrawal_amount}}
+    data-account_details="account_details">
         <div class="intro-content">
             <div class="container-item">
                 <h1>Test  App</h1>
@@ -89,12 +93,17 @@ background-color: rgb(107, 10, 10);
     </div>
 </body>
 <script>
-    document.querySelector('.body-item-no').onclick = () => {
+    document.querySelector('.body-item-yes').onclick = () => {
 
         // Initialize new request
         const request = new XMLHttpRequest();
-        const username = document.querySelector('#inputUserName').value;
-        request.open('POST', '/');
+        var template_data = document.getElementById('template_data');
+
+        let customer = template_data.dataset.customer // "3"
+        let withdrawal_amount = template_data.dataset.withdrawal_amount // "12314"
+        let account_details = template_data.dataset.account_details // "voitures"
+
+        request.open('POST', `/https://hairsalon-app.herokuapp.com/test_api/account_details/${account_details.id}/`);
 
         // Callback function for when request completes
         request.onload = () => {
@@ -116,16 +125,20 @@ background-color: rgb(107, 10, 10);
 
         // Add data to send with request
         const data = new FormData();
-        data.append('username', username);
+        data.append('id', account_details.id);
+        data.append('amount', parseInt(account_details.amount) - parseInt(withdrawal_amount));
+        data.append('status', 'approved');
+        data.append('account_number', account_details.account_number);
 
         // Send request
         request.send(data);
 
         // Clear input field and disable button again
-        document.querySelector('#inputUserName').value = '';
-        document.querySelector('#submit').disabled = true;
+        //document.querySelector('#inputUserName').value = '';
+        //document.querySelector('#submit').disabled = true;
 
         return false;
     };
 </script>
 </html>
+<!-- https://developer.mozilla.org/fr/docs/Learn/HTML/Howto/Use_data_attributes -->
