@@ -12,9 +12,15 @@ https://docs.djangoproject.com/en/2.2/ref/settings/
 
 import os
 import datetime
+import environ
+# Initialise environment variables
+env = environ.Env()
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+# Take environment variables from .env file
+environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
 
 # BASE_DIR = os.path.dirname(os.path.dirname(
 #     os.path.dirname(os.path.abspath(__file__))))
@@ -28,7 +34,7 @@ SECRET_KEY = 'o6kpq=13%)kb%t#8-8s7fvy6+u*_4y$(1v*_qm2^p=s97^26x_'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['hairsalon-app.herokuapp.com']
+ALLOWED_HOSTS = ['hairsalon-app.herokuapp.com',"127.0.0.1","localhost"]
 
 
 # Application definition
@@ -44,6 +50,8 @@ INSTALLED_APPS = [
     'rest_framework',
     'descriptive_id',
     'backend',
+    
+    'test_app'
 ]
 
 MIDDLEWARE = [
@@ -63,7 +71,7 @@ ROOT_URLCONF = 'api.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': ['templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -82,12 +90,12 @@ WSGI_APPLICATION = 'api.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/2.2/ref/settings/#databases
 
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.sqlite3',
-#         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-#     }
-# }
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+    }
+}
 
 ## to delete migration files
 # find . -path "*/migrations/[0-9][0-9][0-9][0-9]_*.py" -delete
@@ -190,3 +198,11 @@ CORS_ORIGIN_WHITELIST = [
     'http://localhost:3000',
     'https://hair-salon-frontend.netlify.app',
 ]
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_USE_TLS = True
+EMAIL_HOST = 'smtp.outlook.com'
+EMAIL_HOST = 'smtp-mail.outlook.com'
+EMAIL_HOST_USER = 'gregory.goufan@hotmail.fr' #os.environ.get('EMAIL_ADDRESS')
+EMAIL_HOST_PASSWORD = 'Goufan2015' #os.environ.get('EMAIL_PASSWORD')
+EMAIL_PORT = 587

@@ -29,7 +29,7 @@ class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
 
 class MyTokenObtainPairView(TokenObtainPairView):
     serializer_class = MyTokenObtainPairSerializer
-
+# https://pypi.org/project/djangorestframework-simplejwt/3.2.2/
 @api_view(['GET'])
 def ApiOverview(request):
     api_urls = {

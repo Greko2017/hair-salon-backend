@@ -29,6 +29,7 @@ from backend.views import MyTokenObtainPairView
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include('backend.urls')),
+    path('test_api/', include('test_app.urls')),
 
     url(r'^media/(?P<path>.*)$', serve,{'media': settings.MEDIA_ROOT}), 
     url(r'^static/(?P<path>.*)$', serve,{'static': settings.STATIC_ROOT}), 

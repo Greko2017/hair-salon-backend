@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/static/main.css">
+    <style>
+        
+* {
+    box-sizing: border-box;
+  }
+  
+  body {
+    margin: 0;
+    font-family: sans-serif;
+  }
+  
+  .container-item{
+    width :50%;
+  }
+  
+  .container {
+    background: #23424a;
+    color: white;
+    padding: 50px 0px;
+  }
+  
+  .intro-content {
+    max-width: 50%;
+    margin: 0 auto;
+    /* width: 50%; */
+  }
+  
+  .body-container {
+    max-width: 50%;
+    margin: 0 auto;
+    color:black;
+    padding: 15px 0px;
+  }
+
+  .body-content{
+      display: flex;
+      justify-content: space-around;
+      padding-top: 4em;
+  }
+
+  .body-item-no, .body-item-yes{
+      display: block;
+      padding: 2rem 5rem;
+      border-radius: .25rem;
+      font-size: 1.5rem;
+      color: white;
+      font-weight: bold;
+      text-decoration: none;
+      margin: 0 4.5rem;
+  }
+
+  .body-item-no{
+      background-color: rgb(177, 13, 13);
+  }
+  .body-item-yes{
+    background-color: rgba(31, 148, 18, 0.659);
+  }
+  
+.body-item-no:hover{
+background-color: rgb(107, 10, 10);
+}
+.body-item-yes:hover{
+  background-color: rgba(12, 75, 5, 0.659);
+}
+    </style>
+    <title>Email Html</title>
+</head>
+<body>
+    <div class="container">
+        <div class="intro-content">
+            <div class="container-item">
+                <h1>Test  App</h1>
+                <p>by clicking on Yes you agree to withdraw the amount of {{withdrawal_amount}} to your Account</p>
+            </div>
+        </div>
+    </div>
+    <div class="body-container">
+        <div class="body-content">
+            <a href="#" class="body-item-no">No</a>
+            <a href="#" class="body-item-yes">Yes</a>
+        </div>
+    </div>
+</body>
+<script>
+    document.querySelector('.body-item-no').onclick = () => {
+
+        // Initialize new request
+        const request = new XMLHttpRequest();
+        const username = document.querySelector('#inputUserName').value;
+        request.open('POST', '/');
+
+        // Callback function for when request completes
+        request.onload = () => {
+
+            // Extract JSON data from request
+            const data = JSON.parse(request.responseText);
+            
+            // Update the result div
+            if (data.success) {
+                localStorage.setItem('username',data.username);
+
+                window.location.assign("/home");
+                
+            }
+            else {
+                document.querySelector('#result').innerHTML = 'There was an error.';
+            }
+        }
+
+        // Add data to send with request
+        const data = new FormData();
+        data.append('username', username);
+
+        // Send request
+        request.send(data);
+
+        // Clear input field and disable button again
+        document.querySelector('#inputUserName').value = '';
+        document.querySelector('#submit').disabled = true;
+
+        return false;
+    };
+</script>
+</html>
