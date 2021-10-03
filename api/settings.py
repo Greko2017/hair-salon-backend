@@ -204,4 +204,4 @@ EMAIL_USE_TLS = True
 EMAIL_HOST = 'smtp.office365.com'
 EMAIL_HOST_USER = 'gregory.goufan@hotmail.fr' #os.environ.get('EMAIL_ADDRESS')
 EMAIL_HOST_PASSWORD = 'Goufan2015' #os.environ.get('EMAIL_PASSWORD')
-EMAIL_PORT = 587
+EMAIL_PORT = 25
