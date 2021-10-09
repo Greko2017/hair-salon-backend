@@ -113,7 +113,7 @@ class SaleAdmin(admin.ModelAdmin):
 
 class SaleLineAdmin(admin.ModelAdmin):
   list_display = [
-    'id', 'parent_id', 'product_id', 'product_quantity', 'amount_paid', 'payment_method','details', 'created_at'
+    'id', 'parent_id', 'product_id', 'product_quantity','is_credit', 'amount_paid', 'payment_method','details', 'created_at'
   ]
 
 admin.site.register(Department, DepartmentAdmin)

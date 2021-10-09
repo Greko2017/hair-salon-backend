@@ -17,7 +17,7 @@ STATUS = (
 
 class AccountDetails(models.Model):
     account_number = models.CharField(max_length=24)
-    amount = models.IntegerField( null=True)
+    amount = models.IntegerField(default=0, null=True)
     status = models.CharField(choices=STATUS, max_length=12, default='draft',blank=True,)
     def __str__(self):
         return str(f'{self.account_number}: {self.amount}')

@@ -19,6 +19,7 @@ router.register('product', ProductViewSet, 'product')
 router.register('supplier', SupplierViewSet, 'supplier')
 router.register('sale', SaleViewSet, 'sale')
 router.register('saleline', SaleLineViewSet, 'saleline')
+router.register('saleslines_by_parent_id', SalesLineByParentIdViewSet, 'saleslines_by_parent_id')
 router.register('servicelines_by_parent_id', ServiceLineByParentIdViewSet, 'servicelines_by_parent_id')
 router.register('service_by_id', ServiceByIdViewSet, 'service_by_id')
 

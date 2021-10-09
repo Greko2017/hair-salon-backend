@@ -172,6 +172,7 @@ class SaleLine(models.Model):
     product_id = models.ForeignKey(Product, on_delete=models.SET_NULL, blank=True, null=True)
     product_quantity = models.PositiveIntegerField(blank=True, null=True)
     amount_paid = models.PositiveIntegerField(default=0)
+    is_credit = models.BooleanField(help_text='When positive the amount given is paid by the client', default=True)
     details = models.TextField(max_length=150, blank=True, null=True)
     payment_method = models.CharField(choices=(('om','Orange Money'),('momo','MTN Money'),),max_length=15)
     created_at = models.DateTimeField(auto_now_add=True)

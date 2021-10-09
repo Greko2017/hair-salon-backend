@@ -245,3 +245,15 @@ class ServiceByIdViewSet(viewsets.ReadOnlyModelViewSet):
 
     serializer_class = ServiceSerializer
 
+
+class SalesLineByParentIdViewSet(viewsets.ReadOnlyModelViewSet):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        request = self.request
+        queryset = SaleLine.objects.all()
+        parent_id = request.GET.get('parent_id', None)
+        income_lines = get_list_or_404(queryset, parent_id=parent_id)
+        return income_lines
+
+    serializer_class = SaleLineSerializer

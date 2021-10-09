@@ -35,7 +35,7 @@ class ServiceLineSerializer(serializers.ModelSerializer):
         depth = 2
         
         def create(self, validated_data):
-            print('-- In ServiceLineSerializer create', validated_data)
+            # print('-- In ServiceLineSerializer create', validated_data)
             customer_id = validated_data.get("customer_id", None)
             lookup = validated_data.get("lookup", None)
             # Once you are done, create the instance with the validated data
@@ -86,6 +86,10 @@ class ProductSerializer(serializers.ModelSerializer):
     class Meta:
         model = Product
         fields = ('__all__')
+    def to_representation(self, instance):
+        rep = super().to_representation(instance)
+        rep["category"] = CategorySerializer(instance.category_id, many=False).data
+        return rep
         
 class SupplierSerializer(serializers.ModelSerializer):
     class Meta:
@@ -97,10 +101,15 @@ class SaleLineSerializer(serializers.ModelSerializer):
         model = SaleLine
         fields = ('__all__')
 
-        depth = 2
+    def to_representation(self, instance):
+        rep = super().to_representation(instance)
+        rep["parent"] = SaleSerializer(instance.parent_id, many=False).data
+        rep["product"] = ProductSerializer(instance.product_id, many=False).data
+        return rep
+        
 
 class SaleSerializer(serializers.ModelSerializer):
-    salelines = SaleLineSerializer(many=True, read_only=True)
+    # salelines = SaleLineSerializer(many=True, read_only=True)
     class Meta:
         model = Sale
         fields = ('__all__')
@@ -109,6 +118,15 @@ class SaleSerializer(serializers.ModelSerializer):
         rep = super().to_representation(instance)
         rep["saler"] = EmployeeSerializer(instance.saler_id, many=False).data
         rep["customer"] = CustomerSerializer(instance.customer_id, many=False).data
+                        
+        saleline_queryset = list(SaleLine.objects.filter(parent_id=instance.id).values())
+        # print('In SaleSerializer', saleline_queryset)
+        for item in saleline_queryset:
+            item['parent'] = Sale.objects.filter(id=item['parent_id_id']).values().first()
+            item['product'] = Product.objects.filter(id=item['product_id_id']).values().first()
+            
+        rep['salelines'] = saleline_queryset
+
         return rep
         
 # https://www.django-rest-framework.org/api-guide/relations/
