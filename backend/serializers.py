@@ -8,6 +8,20 @@ from django.contrib.contenttypes.models import ContentType
 #https://stackoverflow.com/questions/48314694/after-login-the-rest-auth-how-to-return-more-information
 
 
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = (
+            'id',
+            'email',
+            'first_name',
+            'username',
+            'last_name',
+            'groups',
+            'user_permissions',
+        )  #'username'
+        depth = 1
+
 class DepartmentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Department
@@ -129,6 +143,80 @@ class SaleSerializer(serializers.ModelSerializer):
 
         return rep
         
+class PayrollOtherPaySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PayrollOtherPay
+        fields = ('__all__')
+        depth = 2
+        
+    def validate(self, data):
+        """
+        Take parent parameter and pass it to validated data
+        """
+        # print('--- PayrollOtherPay validate', self.initial_data)
+        parent_id = self.initial_data.get('parent', None)
+        if parent_id is not None:
+            parent = Payroll.objects.get(id=parent_id)
+            data['parent'] = parent
+        # print('--- PayrollOtherPay data', data)
+        return data
+
+    def create(self, validated_data):
+        return PayrollOtherPay.objects.create(**validated_data)
+
+        
+class PayrollDeductionSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = PayrollDeduction
+        fields = ('__all__')
+        depth = 2
+
+    def validate(self, data):
+        """
+        Take parent parameter and pass it to validated data
+        """
+        parent_id = self.initial_data.get('parent', None)
+        if parent_id is not None:
+            parent = Payroll.objects.get(id=parent_id)
+            data['parent'] = parent
+        return data
+
+    # def create(self, validated_data):
+    #     parent = validated_data.get("parent", None)
+    #     return PayrollDeduction.objects.create(parent=parent, **validated_data)
+
+        
+class PayrollSerializer(serializers.ModelSerializer):
+    other_pays = PayrollOtherPaySerializer(many=True, read_only=True)
+    deductions = PayrollDeductionSerializer(many=True, read_only=True)
+    
+    def to_representation(self, instance):
+        rep = super().to_representation(instance)
+        rep["employee"] = EmployeeSerializer(instance.employee, many=False).data
+        rep['owner'] = User.objects.filter(id=instance.created_by.id).values().first()
+        return rep
+    class Meta:
+        model = Payroll
+        fields = ('id', 'created_at','name','status','date_from', 'date_to', 'worked_value', 'computed_salary', 'employee', 'net_salary','other_pays','deductions',)
+
+
+class InventorySerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Inventory
+        fields = ('__all__')
+        depth = 2
+
+    def validate(self, data):
+        """
+        Take parent parameter and pass it to validated data
+        """
+        product = self.initial_data.get('product', None)
+        if product is not None:
+            product = Product.objects.get(id=product)
+            data['product'] = product
+        return data
 # https://www.django-rest-framework.org/api-guide/relations/
 # https://stackoverflow.com/questions/59792488/serializing-nested-objects-in-drfs
 # Django Rest Framework API #16 / Many To One Relationship, Nested Data: https://www.youtube.com/watch?v=nB1MczHlweA

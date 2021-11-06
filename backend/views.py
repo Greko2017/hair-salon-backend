@@ -12,7 +12,8 @@ from .models import *
 from django.contrib.contenttypes.models import ContentType
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework_simplejwt.views import TokenObtainPairView
-
+import json
+from django.core import serializers
 # https://stackoverflow.com/questions/54544978/customizing-jwt-response-from-django-rest-framework-simplejwt
 class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
     def validate(self, attrs):
@@ -24,8 +25,9 @@ class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
         # Add extra responses here
         data['username'] = self.user.username
         data['groups'] = self.user.groups.values_list('name', flat=True)
-        return data
+        data['user'] = UserSerializer(self.user).data
 
+        return data
 
 class MyTokenObtainPairView(TokenObtainPairView):
     serializer_class = MyTokenObtainPairSerializer
@@ -257,3 +259,77 @@ class SalesLineByParentIdViewSet(viewsets.ReadOnlyModelViewSet):
         return income_lines
 
     serializer_class = SaleLineSerializer
+    
+class PayrollViewSet(viewsets.ModelViewSet):
+    queryset = Payroll.objects.all().order_by('-id')
+
+    serializer_class = PayrollSerializer
+
+    def get_queryset(self):
+        return Payroll.objects.all().order_by('-id')
+    
+    def perform_create(self, serializer):
+        user = None
+        if self.request and hasattr(self.request, "user"):
+            user = self.request.user
+        serializer.save(created_by=user)
+        
+class PayrollOtherPayViewSet(viewsets.ModelViewSet):
+    queryset = PayrollOtherPay.objects.all().order_by('-id')
+
+    serializer_class = PayrollOtherPaySerializer
+
+    def get_queryset(self):
+        return PayrollOtherPay.objects.all().order_by('-id')
+        
+class PayrollDeductionViewSet(viewsets.ModelViewSet):
+    queryset = PayrollDeduction.objects.all().order_by('-id')
+
+    serializer_class = PayrollDeductionSerializer
+
+    def get_queryset(self):
+        return PayrollDeduction.objects.all().order_by('-id')
+
+
+class PayrollOtherPayByParentIdViewSet(viewsets.ReadOnlyModelViewSet):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        request = self.request
+        queryset = PayrollOtherPay.objects.all()
+        parent_id = request.GET.get('parent_id', None)
+        income_lines = get_list_or_404(queryset, parent_id=parent_id)
+        return income_lines
+
+    serializer_class = PayrollOtherPaySerializer
+    
+class PayrollDeductionByParentIdViewSet(viewsets.ReadOnlyModelViewSet):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        request = self.request
+        queryset = PayrollDeduction.objects.all()
+        parent_id = request.GET.get('parent_id', None)
+        income_lines = get_list_or_404(queryset, parent_id=parent_id)
+        return income_lines
+
+    serializer_class = PayrollDeductionSerializer
+    
+class PayrollToApproveViewSet(viewsets.ReadOnlyModelViewSet):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        request = self.request
+        queryset = Payroll.objects.all()
+        payroll_to_approve = get_list_or_404(queryset, employee__user=request.user, status='to_approve')
+        return payroll_to_approve
+
+    serializer_class = PayrollSerializer
+
+class InventoryViewSet(viewsets.ModelViewSet):
+    permission_classes = [permissions.IsAuthenticated]
+
+    serializer_class = InventorySerializer
+
+    def get_queryset(self):
+        return Inventory.objects.all().order_by('-id')
