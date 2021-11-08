@@ -96,14 +96,14 @@ class LocationSerializer(serializers.ModelSerializer):
 #         model = Category
 #         fields = ('__all__')
         
-# class ProductSerializer(serializers.ModelSerializer):
-#     class Meta:
-#         model = Product
-#         fields = ('__all__')
-#     def to_representation(self, instance):
-#         rep = super().to_representation(instance)
-#         rep["category"] = CategorySerializer(instance.category_id, many=False).data
-#         return rep
+class ProductSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Product
+        fields = ('__all__')
+    def to_representation(self, instance):
+        rep = super().to_representation(instance)
+        # rep["category"] = CategorySerializer(instance.category_id, many=False).data
+        return rep
         
 class SupplierSerializer(serializers.ModelSerializer):
     class Meta:

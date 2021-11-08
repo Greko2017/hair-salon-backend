@@ -92,7 +92,7 @@ class EmployeeAdmin(admin.ModelAdmin):
 
 class ProductAdmin(admin.ModelAdmin):
     list_display = [
-        'id', 'name', 'description','quantity', 'cost_price', 'selling_price', 'category_id'
+        'id', 'name', 'description','quantity', 'cost_price', 'selling_price',# 'category_id'
     ]
 
     search_fields = ['id', 'name',]
