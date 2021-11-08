@@ -83,12 +83,12 @@ class EmployeeAdmin(admin.ModelAdmin):
 
     search_fields = ['id',]
 
-class CategoryAdmin(admin.ModelAdmin):
-    list_display = [
-        'id', 'name', 'description',
-    ]
+# class CategoryAdmin(admin.ModelAdmin):
+#     list_display = [
+#         'id', 'name', 'description',
+#     ]
 
-    search_fields = ['id', 'name',]
+#     search_fields = ['id', 'name',]
 
 class ProductAdmin(admin.ModelAdmin):
     list_display = [
@@ -162,7 +162,7 @@ admin.site.register(City, CityAdmin)
 admin.site.register(Street, StreetAdmin)
 admin.site.register(Location, LocationAdmin)
 admin.site.register(Employee, EmployeeAdmin)
-admin.site.register(Category, CategoryAdmin)
+# admin.site.register(Category, CategoryAdmin)
 admin.site.register(Product, ProductAdmin)
 admin.site.register(Supplier, SupplierAdmin)
 admin.site.register(ServiceLookup, ServiceLookupAdmin)

@@ -160,13 +160,13 @@ class EmployeeViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         return Employee.objects.all().order_by('-id')
         
-class CategoryViewSet(viewsets.ModelViewSet):
-    queryset = Category.objects.all().order_by('-id')
+# class CategoryViewSet(viewsets.ModelViewSet):
+#     queryset = Category.objects.all().order_by('-id')
 
-    serializer_class = CategorySerializer
+#     serializer_class = CategorySerializer
 
-    def get_queryset(self):
-        return Category.objects.all().order_by('-id')
+#     def get_queryset(self):
+#         return Category.objects.all().order_by('-id')
         
 class ProductViewSet(viewsets.ModelViewSet):
     queryset = Product.objects.all().order_by('-id')
