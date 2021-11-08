@@ -91,14 +91,14 @@ class Employee(models.Model):
     def __str__(self):
         return str(self.user.username)
 
-# class Category(models.Model):
-#     name = models.CharField( max_length=150)
-#     description = models.TextField(blank=True,null=True)
-#     # class Meta:
-#     #     # Add verbose name
-#     #     verbose_name = 'Categorie'
-#     def __str__(self):
-#         return str(self.name)
+class Category(models.Model):
+    name = models.CharField( max_length=150)
+    description = models.TextField(blank=True,null=True)
+    # class Meta:
+    #     # Add verbose name
+    #     verbose_name = 'Categorie'
+    def __str__(self):
+        return str(self.name)
 
 class Supplier(models.Model):
     name = models.CharField( max_length=150)
@@ -116,7 +116,7 @@ class Product(models.Model):
     quantity = models.PositiveIntegerField(blank=True,null=True)
     cost_price = models.IntegerField(blank=True,null=True)
     selling_price = models.IntegerField(blank=True,null=True)
-    # category_id = models.ForeignKey(Category, on_delete=models.CASCADE,blank=True,null=True)
+    category_id = models.ForeignKey(Category, on_delete=models.CASCADE,blank=True,null=True)
     # https://docs.djangoproject.com/en/2.2/topics/db/examples/many_to_many/
     supplier = models.ManyToManyField(Supplier,blank=True)
     
