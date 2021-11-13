@@ -260,7 +260,7 @@ class Payroll(models.Model):
                     # print('-- In serviceline',serviceline.id, serviceline.amount_paid)
                     tmp_total_amount_paid = tmp_total_amount_paid + serviceline.amount_paid
                 computed_salary = computed_salary + tmp_total_amount_paid
-            return (computed_salary*percentage) / 100
+            return ((computed_salary*percentage) / 100) + income
         else:
             computed_salary = income
 
