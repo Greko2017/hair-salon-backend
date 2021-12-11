@@ -1,4 +1,5 @@
 # Create your views here.
+from django.db.models.fields import FloatField, IntegerField
 from django.http import JsonResponse
 
 from rest_framework.decorators import api_view
@@ -7,13 +8,14 @@ from .serializers import *
 from django.shortcuts import get_list_or_404, get_object_or_404, render
 from rest_framework import viewsets, permissions
 from django.contrib.auth.models import User, Group, Permission
-
 from .models import *
 from django.contrib.contenttypes.models import ContentType
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework_simplejwt.views import TokenObtainPairView
 import json
 from django.core import serializers
+from django.db.models import Sum
+
 # https://stackoverflow.com/questions/54544978/customizing-jwt-response-from-django-rest-framework-simplejwt
 class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
     def validate(self, attrs):
@@ -60,21 +62,60 @@ class SalaryViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         return Salary.objects.all().order_by('-id')
         
+def customerFilter(request):
+    qs = Customer.objects.all().order_by('-id') #created_at
+    first_name_contains_query = request.GET.get('first_name_contains')
+    last_name_contains_query = request.GET.get('last_name_contains')
+    date_min = request.GET.get('date_min')
+    date_max = request.GET.get('date_max')
+
+    if is_valid_queryparam(first_name_contains_query):
+        qs = qs.filter(first_name__icontains=first_name_contains_query)
+
+    if is_valid_queryparam(last_name_contains_query):
+        qs = qs.filter(last_name__icontains=last_name_contains_query)
+
+    if is_valid_queryparam(date_min):
+        qs = qs.filter(created_at__gte=date_min)
+
+    if is_valid_queryparam(date_max):
+        qs = qs.filter(created_at__lt=date_max)
+    return qs
+
 class CustomerViewSet(viewsets.ModelViewSet):
     queryset = Customer.objects.all().order_by('-id')
 
     serializer_class = CustomerSerializer
 
     def get_queryset(self):
-        return Customer.objects.all().order_by('-id')
+        return customerFilter(self.request)
+
+def is_valid_queryparam(param):
+    return param != '' and param is not None
         
+def serviceFilter(request):
+    qs = Service.objects.all().order_by('-id') #created
+    name_contains_query = request.GET.get('name_contains')
+    date_min = request.GET.get('date_min')
+    date_max = request.GET.get('date_max')
+
+    if is_valid_queryparam(name_contains_query):
+        qs = qs.filter(name__icontains=name_contains_query)
+
+    if is_valid_queryparam(date_min):
+        qs = qs.filter(created__gte=date_min)
+
+    if is_valid_queryparam(date_max):
+        qs = qs.filter(created__lt=date_max)
+    return qs
+
 class ServiceViewSet(viewsets.ModelViewSet):
     queryset = Service.objects.all().order_by('-id')
 
     serializer_class = ServiceSerializer
 
     def get_queryset(self):
-        return Service.objects.all().order_by('-id')
+        return serviceFilter(self.request)
     
     def perform_create(self, serializer):
         user = None
@@ -82,13 +123,58 @@ class ServiceViewSet(viewsets.ModelViewSet):
             user = self.request.user
         serializer.save(created_by=user)
         
-class ServiceLineViewSet(viewsets.ModelViewSet):
+
+def serviceLineFilter(request):
+    qs = ServiceLine.objects.all().order_by('-id') #created_at
+    name_contains_query = request.GET.get('name_contains')
+    date_min = request.GET.get('date_min')
+    date_max = request.GET.get('date_max')
+
+    if is_valid_queryparam(name_contains_query):
+        qs = qs.filter(parent_id__name__icontains=name_contains_query)
+
+    if is_valid_queryparam(date_min):
+        qs = qs.filter(created__gte=date_min)
+
+    if is_valid_queryparam(date_max):
+        qs = qs.filter(created__lt=date_max)
+    return qs
+from rest_framework import serializers
+from rest_framework.renderers import JSONRenderer
+
+class ServiceLineBestEmployeeSerializer(serializers.Serializer):
+    parent_id__employee_id__user__username = serializers.CharField(max_length=300)
+    total_employee_service_amount = serializers.IntegerField()
+    parent_id__employee_id__salary_id__income = IntegerField()
+
+def ServiceLineBestEmployeeFilter(request, queryset):
+    date_min = request.GET.get('date_min')
+    date_max = request.GET.get('date_max')
+
+    if is_valid_queryparam(date_min):
+        queryset = queryset.filter(created__gte=date_min)
+
+    if is_valid_queryparam(date_max):
+        queryset = queryset.filter(created__lt=date_max)
+
+    return queryset
+
+@api_view(['GET'])
+def ServiceLineBestEmployeeViewSet(request):
+    qs = ServiceLineBestEmployeeFilter(request, ServiceLine.objects.all())
+    queryset = qs.values('parent_id__employee_id__user__username', 'parent_id__employee_id__salary_id__income').annotate(total_employee_service_amount= Sum('amount_paid'))
+    
+    if request.method == "GET":
+        serializer = ServiceLineBestEmployeeSerializer(queryset, many=True)
+        return Response(serializer.data)
+
+class ServiceLineViewSet(viewsets.ModelViewSet):   
     queryset = ServiceLine.objects.all().order_by('-id')
 
     serializer_class = ServiceLineSerializer
 
     def get_queryset(self):
-        return ServiceLine.objects.all().order_by('-id')
+        return serviceLineFilter(self.request)
     
     def create(self, request, *args, **kwargs):
         service_data = request.data
@@ -199,22 +285,56 @@ class SupplierViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         return Supplier.objects.all().order_by('-id')
+
         
+def saleFilter(request):
+    qs = Sale.objects.all().order_by('-id') #created_at
+    name_contains_query = request.GET.get('name_contains')
+    date_min = request.GET.get('date_min')
+    date_max = request.GET.get('date_max')
+
+    if is_valid_queryparam(name_contains_query):
+        qs = qs.filter(name__icontains=name_contains_query)
+
+    if is_valid_queryparam(date_min):
+        qs = qs.filter(created_at__gte=date_min)
+
+    if is_valid_queryparam(date_max):
+        qs = qs.filter(created_at__lt=date_max)
+    return qs
+
 class SaleViewSet(viewsets.ModelViewSet):
     queryset = Sale.objects.all().order_by('-id')
 
     serializer_class = SaleSerializer
-
+    
     def get_queryset(self):
-        return Sale.objects.all().order_by('-id')
-        
+        return saleFilter(self.request)
+
+
+def saleLineFilter(request):
+    qs = SaleLine.objects.all().order_by('-id') #created_at
+    name_contains_query = request.GET.get('name_contains')
+    date_min = request.GET.get('date_min')
+    date_max = request.GET.get('date_max')
+
+    if is_valid_queryparam(name_contains_query):
+        qs = qs.filter(parent_id__name__icontains=name_contains_query)
+
+    if is_valid_queryparam(date_min):
+        qs = qs.filter(created_at__gte=date_min)
+
+    if is_valid_queryparam(date_max):
+        qs = qs.filter(created_at__lt=date_max)
+    return qs
+
 class SaleLineViewSet(viewsets.ModelViewSet):
     queryset = SaleLine.objects.all().order_by('-id')
 
     serializer_class = SaleLineSerializer
 
     def get_queryset(self):
-        return SaleLine.objects.all().order_by('-id')
+        return saleLineFilter(self.request)
 
 class ServiceLineByParentIdViewSet(viewsets.ReadOnlyModelViewSet):
     permission_classes = [permissions.IsAuthenticated]
@@ -333,3 +453,43 @@ class InventoryViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         return Inventory.objects.all().order_by('-id')
+
+from rest_framework import status
+from rest_framework.decorators import api_view
+
+@api_view(['GET', ]) # 'PUT', 'DELETE'
+def number_of_customer(request):
+    """
+    Retrieve, total client register on the system.
+    """
+    qs = Customer.objects.all().order_by('-id')
+
+    date_min = request.GET.get('date_min')
+    date_max = request.GET.get('date_max')
+
+    if is_valid_queryparam(date_min):
+        qs = qs.filter(publish_date__gte=date_min)
+
+    if is_valid_queryparam(date_max):
+        qs = qs.filter(publish_date__lt=date_max)
+    # try:
+    #     snippet = Customer.objects.get(pk=pk)
+    # except Customer.DoesNotExist:
+    #     return Response(status=status.HTTP_404_NOT_FOUND)
+
+    if request.method == 'GET':
+        # serializer = CustomerSerializer(customer)
+        # return Response(serializer.data)
+        customer_nbr = qs.count()
+        return Response(customer_nbr)
+
+    # elif request.method == 'PUT':
+    #     serializer = SnippetSerializer(snippet, data=request.data)
+    #     if serializer.is_valid():
+    #         serializer.save()
+    #         return Response(serializer.data)
+    #     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    # elif request.method == 'DELETE':
+    #     snippet.delete()
+    #     return Response(status=status.HTTP_204_NO_CONTENT)

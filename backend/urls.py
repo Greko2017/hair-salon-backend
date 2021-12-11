@@ -30,8 +30,12 @@ router.register('deduction_by_parent_id', PayrollDeductionByParentIdViewSet, 'de
 router.register('payroll_to_approve', PayrollToApproveViewSet, 'payroll_to_approve')
 router.register('inventory', InventoryViewSet, 'inventory')
 
+# router.register('best_employee', ServiceLineBestEmployeeViewSet, 'best_employee')
+
 urlpatterns = router.urls
 
 urlpatterns += [
-    path('', views.ApiOverview, name="api-overview")
+    path('', views.ApiOverview, name="api-overview"),
+    path('number_of_customer/', views.number_of_customer),
+    path('best_employee/', views.ServiceLineBestEmployeeViewSet),
 ]

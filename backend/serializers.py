@@ -77,7 +77,8 @@ class ServiceSerializer(serializers.ModelSerializer):
           employee_id = Employee.objects.get(user=instance.created_by.id)
           rep["owner"] = EmployeeSerializer(employee_id, many=False).data
         except Exception as e:
-          print("An exception occurred: ", e) 
+        #   print("An exception occurred: ", e) 
+            pass
         return rep
 
 class CitySerializer(serializers.ModelSerializer):
@@ -198,7 +199,7 @@ class PayrollSerializer(serializers.ModelSerializer):
         return rep
     class Meta:
         model = Payroll
-        fields = ('id', 'created_at','name','status','date_from', 'date_to', 'worked_value', 'computed_salary', 'employee', 'net_salary','other_pays','deductions',)
+        fields = ('id', 'created_at','name','status','date_from', 'date_to', 'worked_value', 'net_salary', 'computed_salary', 'employee','other_pays','deductions',)
 
 
 class InventorySerializer(serializers.ModelSerializer):
