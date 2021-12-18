@@ -55,6 +55,11 @@ class Customer(models.Model):
 
     def __str__(self):
         return str(f'{self.firstname} {self.lastname}')
+    class Meta:
+        permissions = (
+            ("user_customer", "User Customer"),
+            ("management_customer", "Manager customer"),
+        )
 class City(models.Model):
     name = models.CharField( max_length=12)
     
@@ -164,7 +169,7 @@ class ServiceLine(models.Model):
     lookup = models.ForeignKey(ServiceLookup, on_delete=models.CASCADE, blank=True, null=True,related_name='lookup')
     # product_id = models.ForeignKey(Service, on_delete=models.CASCADE, blank=True, null=True)
     quantity = models.PositiveIntegerField(default=1)
-    is_credit = models.BooleanField(help_text='When positive the amount given has been paid by the client')
+    is_credit = models.BooleanField(help_text='When positive the amount given has been paid by the client', default=False)
     customer_id = models.ForeignKey(Customer, on_delete=models.CASCADE)
     amount_paid = models.PositiveIntegerField(default=0)
     details = models.TextField(max_length=150, blank=True, null=True)
@@ -190,7 +195,7 @@ class SaleLine(models.Model):
     product_id = models.ForeignKey(Product, on_delete=models.SET_NULL, blank=True, null=True)
     product_quantity = models.PositiveIntegerField(blank=True, null=True)
     amount_paid = models.PositiveIntegerField(default=0)
-    is_credit = models.BooleanField(help_text='When positive the amount given is paid by the client', default=True)
+    is_credit = models.BooleanField(help_text='When positive the amount given is paid by the client', default=False)
     details = models.TextField(max_length=150, blank=True, null=True)
     payment_method = models.CharField(choices=(('om','Orange Money'),('momo','MTN Money'),('cash','Cash')),max_length=15)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -229,10 +234,49 @@ class Payroll(models.Model):
 
     def __str__(self):
         return '%s, %s, %s' % (self.name, self.employee.user.username, self.net_salary)
-    
+        
+    def _get_worked_value_in_period(self):
+        worked_value = 0
+        # income = 0
+        # if self.employee.salary_id.income is not None:
+        #     income = self.employee.salary_id.income
+        services = Service.objects.filter(employee_id=self.employee.id).filter(created__range=(self.date_from, self.date_to), employee_id=self.employee.id)
+        
+        for service in services:
+            tmp_total_amount_paid = 0
+            for serviceline in service.servicelines.all():
+                # print('-- In serviceline',serviceline.id, serviceline.amount_paid, serviceline.quantity)
+                tmp_total_amount_paid = tmp_total_amount_paid + (serviceline.amount_paid*serviceline.quantity)
+            worked_value = worked_value + tmp_total_amount_paid
+
+        return worked_value
+
+
+    def _get_computed_salary(self):
+        computed_salary = 0
+        
+        percentage = self.employee.salary_id.percentage
+        is_percentage = self.employee.salary_id.is_percentage
+        if is_percentage == True or percentage is not None:
+            services = Service.objects.filter(employee_id=self.employee.id).filter(created__range=(self.date_from, self.date_to), employee_id=self.employee.id)
+            # print('--- _get_computed_salary services',self.employee, services)
+            for service in services:
+                tmp_total_amount_paid = 0
+                for serviceline in service.servicelines.all():
+                    # print('-- In serviceline',serviceline.id, serviceline.amount_paid)
+                    tmp_total_amount_paid = tmp_total_amount_paid + (serviceline.amount_paid*serviceline.quantity)
+                computed_salary = computed_salary + tmp_total_amount_paid
+            return int((computed_salary*percentage) / 100)
+        
+
+        return computed_salary
+
     def _get_net_salary(self):
         "Returns the employee's net salary."
         extras = 0
+        income = 0
+        if self.employee.salary_id.income is not None:
+            income = self.employee.salary_id.income
         # print('--- _get_net_salary other_pays', self.other_pays.all())
         for extra in self.other_pays.all():
             # print('--- _get_net_salary extra', extra)
@@ -244,50 +288,12 @@ class Payroll(models.Model):
                 deductions = deductions + deduction.amount
         # print(f'--- extra : {extras} deduction : {deductions}')
 
-        net_salary = self.computed_salary + extras - deductions
+        net_salary = self.computed_salary + income + extras - deductions
         return net_salary
 
-    def _get_computed_salary(self):
-        computed_salary = 0
-        income = 0
-        if self.employee.salary_id.income is not None:
-            income = self.employee.salary_id.income
-        percentage = self.employee.salary_id.percentage
-        is_percentage = self.employee.salary_id.is_percentage
-        if is_percentage == True:
-            services = Service.objects.filter(created__range=(self.date_from, self.date_to), employee_id=self.employee.id)
-            # print('--- _get_computed_salary services',self.employee, services)
-            for service in services:
-                tmp_total_amount_paid = 0
-                for serviceline in service.servicelines.all():
-                    # print('-- In serviceline',serviceline.id, serviceline.amount_paid)
-                    tmp_total_amount_paid = tmp_total_amount_paid + serviceline.amount_paid
-                computed_salary = computed_salary + tmp_total_amount_paid
-            return ((computed_salary*percentage) / 100) + income
-        else:
-            computed_salary = income
-
-        return computed_salary
-
-    def _get_worked_value_in_period(self):
-        worked_value = 0
-        income = 0
-        if self.employee.salary_id.income is not None:
-            income = self.employee.salary_id.income
-        # if income == 0:
-        services = Service.objects.filter(created__range=(self.date_from, self.date_to), employee_id=self.employee.id)
-        # print('--- _get_worked_value services',self.employee, services)
-        for service in services:
-            tmp_total_amount_paid = 0
-            for serviceline in service.servicelines.all():
-                # print('-- In serviceline',serviceline.id, serviceline.amount_paid)
-                tmp_total_amount_paid = tmp_total_amount_paid + serviceline.amount_paid
-            worked_value = worked_value + tmp_total_amount_paid
-        return worked_value + income
-
-    net_salary = property(_get_net_salary)
-    computed_salary = property(_get_computed_salary)
     worked_value = property(_get_worked_value_in_period)
+    computed_salary = property(_get_computed_salary)
+    net_salary = property(_get_net_salary)
     
 class PayrollOtherPay(models.Model):
     parent = models.ForeignKey(Payroll, on_delete=models.CASCADE, related_name='other_pays', null=True)

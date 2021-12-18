@@ -111,7 +111,7 @@ class ServiceLookupAdmin(admin.ModelAdmin):
     search_fields = ['id', 'name',]
 class ServiceLineAdmin(admin.ModelAdmin):
     list_display = [
-        'id', 'parent_id', 'lookup','is_credit', 'customer_id', 'amount_paid','details', 'payment_method', 'created',
+        'id', 'parent_id', 'lookup','is_credit', 'customer_id', 'amount_paid', 'quantity', 'details', 'payment_method', 'created',
     ]
 
     search_fields = ['id', 'parent_id', 'lookup']
